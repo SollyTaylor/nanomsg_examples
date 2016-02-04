@@ -1,0 +1,49 @@
+#!/usr/bin/env python
+# encoding: utf-8
+#
+# Nanomsgxx build script.
+from copy import copy
+from waflib.Task import Task
+
+class strip(Task):
+
+    def run(self):
+        cmd = 'strip -x src/nnxx/' + self.env.libnanomsgxx_name
+        print cmd
+        return self.exec_command(cmd)
+
+def configure(waf):
+    waf.check_cxx(lib='nanomsg')
+    if waf.options.strip:
+        waf.find_program('strip')
+
+def build(waf):
+    conf = copy(waf.env.CXX_CONF_KWARGS)
+    conf.update({
+        'lib'   : ['nanomsgext', 'nanomsg'],
+        'source': waf.path.ant_glob('*.cpp'),
+        'target': 'nnxx',
+    })
+
+    # Generate tasks for building either a static or shared library
+    if waf.options.static:
+        waf.env.libnanomsgxx_name = waf.env.cxxstlib_PATTERN % conf['target']
+        waf.env.nnxx = waf.stlib(**conf)
+    else:
+        waf.env.libnanomsgxx_name = waf.env.cxxshlib_PATTERN % conf['target']
+        waf.env.nnxx = waf.shlib(**conf)
+    waf.env.nnxx.post()
+
+    # Make sure we don't build the library before building the extensions
+    for t1 in waf.env.nnxx.tasks:
+        for t2 in waf.env.nnext.tasks:
+            t1.set_run_after(t2)
+
+    # Run strip after the build was complete
+    if waf.env.with_strip:
+        strip_task = strip(env=waf.env)
+        strip_task.set_inputs([waf.path.find_or_declare(waf.env.libnanomsgxx_name)])
+        waf.add_to_group(strip_task)
+
+    # Define which files will be installed
+    waf.install_files('${PREFIX}/include/nnxx', waf.path.ant_glob('*.h *.hpp message socket testing'))
