@@ -14,12 +14,12 @@ The most benefitial things of this nanomsg_examples project are:
 2. Using the **rep/req** pattern to secure the **server/client** package transmissions, three classical patterns known namely as **rep/req**, **pub/sub** and **pipeline** in the **zeromq** are all shown in the project.
 
 Modify the following code
-    ```
-	int main(int argc, char* argv[])
-	{
-	    int working_mode = REPREQ;
-	//    int working_mode = PUBSUB;
-	//    int working_mode = PIPELINE;
-	...
-    ```
-	to alternate the demonstration patterns.
+
+    int main(int argc, char* argv[])
+    {
+        int working_mode = REPREQ;
+    //    int working_mode = PUBSUB;
+    //    int working_mode = PIPELINE;
+    ...
+    
+to alternate the demonstration patterns.
