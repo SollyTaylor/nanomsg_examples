@@ -61,7 +61,7 @@ HEADERS += \
 
 
 INCLUDEPATH += \
-    build/include
+    $$PWD/build/include
 
 LIBS += \
     -L$$PWD/build/lib/ -lnanomsg
